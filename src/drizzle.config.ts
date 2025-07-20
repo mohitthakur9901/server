@@ -1,4 +1,4 @@
-import { ENV } from "./src/config/env";
+import { ENV } from "./config/env";
 
 export default {
   schema: "./src/db/schema.ts",

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import { ENV } from "./config/env";
 import { client } from "./config/db";
@@ -13,32 +13,28 @@ app.use(cors());
 if (ENV.NODE_ENV === "production") job.start();
 app.use(express.json());
 
-app.get("/api/health", (req, res) => {
+app.get("/api/health", (req: Request, res: Response) => {
   res.send("Server is healthy");
 });
 
-
-app.get("/api/favorites", async (req, res) => {
-    try {
-        const { userId } = req.query;
-        if (!userId) {
-            return res.status(400).json({ error: "Missing required fields" });
-        }
-        const favorites = await client
-            .select()
-            .from(favoritesTable)
-            .where(eq(favoritesTable.userId, userId as string));
-        return res.status(200).json(favorites);
-        
-    } catch (error) {
-        console.error("Error inserting favorite:", error);
-        res.status(500).json({ error: "Internal server error" });
-        
+app.get("/api/favorites", async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
-    
+    const favorites = await client
+      .select()
+      .from(favoritesTable)
+      .where(eq(favoritesTable.userId, userId as string));
+    return res.status(200).json(favorites);
+  } catch (error) {
+    console.error("Error inserting favorite:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-app.post("/api/favorites", async (req, res) => {
+app.post("/api/favorites", async (req: Request, res: Response) => {
   try {
     const { userId, recipeId, title, image, cooktime, servings } = req.body;
 
@@ -65,7 +61,7 @@ app.post("/api/favorites", async (req, res) => {
   }
 });
 
-app.delete("/api/favorites", async (req, res) => {
+app.delete("/api/favorites", async (req: Request, res: Response) => {
   const { userId, recipeId } = req.query;
 
   if (!userId || !recipeId) {
@@ -83,7 +79,6 @@ app.delete("/api/favorites", async (req, res) => {
 
   res.status(200).json({ message: "Favorite deleted successfully" });
 });
-
 
 app.listen(ENV.PORT, () => {
   console.log("Server is running on port", `${ENV.PORT}`);

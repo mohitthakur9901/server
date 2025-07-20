@@ -4,10 +4,13 @@ import { ENV } from "./config/env";
 import { client } from "./config/db";
 import { favoritesTable } from "./db/schema";
 import { and, eq } from "drizzle-orm";
+import job from "./config/cron";
 
 const app = express();
 
 app.use(cors());
+
+if (ENV.NODE_ENV === "production") job.start();
 app.use(express.json());
 
 app.get("/api/health", (req, res) => {
